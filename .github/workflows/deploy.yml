@@ -43,8 +43,8 @@ jobs:
         SERVICE_ARN=$(aws apprunner list-services --query "ServiceSummaryList[?ServiceName=='$SERVICE_NAME'].ServiceArn" --output text)
         
         if [ -n "$SERVICE_ARN" ]; then
-          console.log("Starting deployment for $SERVICE_NAME ($SERVICE_ARN)...")
+          echo "Starting deployment for $SERVICE_NAME ($SERVICE_ARN)..."
           aws apprunner start-deployment --service-arn $SERVICE_ARN
         else
-          console.log("Service $SERVICE_NAME not found. Skipping deployment trigger (ensure Terraform created it).")
+          echo "Service $SERVICE_NAME not found. Skipping deployment trigger (ensure Terraform created it)."
         fi
