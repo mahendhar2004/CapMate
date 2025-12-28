@@ -1,0 +1,12 @@
+{
+  "name": "capmate-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "mobile",
+    "services/*"
+  ],
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
+}
