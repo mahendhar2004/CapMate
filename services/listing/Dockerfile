@@ -6,11 +6,8 @@ WORKDIR /app
 COPY package.json package-lock.json ./
 COPY .gitignore ./
 
-# Copy shared workspace
-COPY services/shared ./services/shared
-
-# Copy service
-COPY services/listing ./services/listing
+# Copy all services (for workspace integrity)
+COPY services ./services
 
 # Install dependencies
 RUN npm install
