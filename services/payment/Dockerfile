@@ -9,6 +9,9 @@ COPY .gitignore ./
 # Copy all services (for workspace integrity)
 COPY services ./services
 
+# Copy mobile (for workspace integrity)
+COPY mobile ./mobile
+
 # Install dependencies
 RUN npm install
 
