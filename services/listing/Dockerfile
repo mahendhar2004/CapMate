@@ -13,7 +13,7 @@ COPY services ./services
 COPY mobile ./mobile
 
 # Install dependencies
-RUN npm install
+RUN npm install --include=dev
 
 # Build shared and service
 RUN npm run build --workspace=@capmate/shared
