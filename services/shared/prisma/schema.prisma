@@ -28,23 +28,52 @@ model College {
   users     User[]
 }
 
+enum VisibilityMode {
+  PUBLIC
+  ANONYMOUS
+}
+
+enum ListingStatus {
+  DRAFT
+  ACTIVE
+  SOLD
+}
+
 model Listing {
-  id        String   @id @default(uuid())
-  title     String
-  price     Float
-  sellerId  String
-  seller    User     @relation(fields: [sellerId], references: [id])
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id             String         @id @default(uuid())
+  title          String
+  description    String
+  price          Float
+  images         String[]
+  category       String
+  condition      String
+  visibilityMode VisibilityMode @default(PUBLIC)
+  status         ListingStatus  @default(DRAFT)
+  sellerId       String
+  seller         User           @relation(fields: [sellerId], references: [id])
+  payments       Payment[]
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+}
+
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  FAILED
 }
 
 model Payment {
-  id        String   @id @default(uuid())
-  amount    Float
-  userId    String
-  user      User     @relation(fields: [userId], references: [id])
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id              String        @id @default(uuid())
+  amount          Float
+  currency        String        @default("INR")
+  status          PaymentStatus @default(PENDING)
+  razorpayOrderId String?
+  userId          String
+  user            User          @relation(fields: [userId], references: [id])
+  listingId       String?
+  listing         Listing?      @relation(fields: [listingId], references: [id])
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
 }
 
 model AuditLog {
