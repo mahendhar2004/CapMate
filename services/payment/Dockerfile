@@ -1,0 +1,25 @@
+FROM node:18-alpine
+
+WORKDIR /app
+
+# Copy root config
+COPY package.json package-lock.json ./
+COPY .gitignore ./
+
+# Copy shared workspace
+COPY services/shared ./services/shared
+
+# Copy service
+COPY services/payment ./services/payment
+
+# Install dependencies
+RUN npm install
+
+# Build shared and service
+RUN npm run build --workspace=@capmate/shared
+RUN npm run build --workspace=@capmate/payment
+
+# Expose port
+EXPOSE 3003
+
+CMD ["node", "services/payment/dist/index.js"]

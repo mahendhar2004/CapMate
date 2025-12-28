@@ -1,0 +1,50 @@
+name: Deploy Services
+
+on:
+  push:
+    branches: [ main, master ]
+
+jobs:
+  deploy:
+    name: Deploy ${{ matrix.service }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        service: [auth, listing, payment]
+    
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ secrets.AWS_REGION }}
+
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v1
+
+    - name: Build and Push Docker Image
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        ECR_REPOSITORY: capmate/${{ matrix.service }}
+        IMAGE_TAG: ${{ github.sha }}
+      run: |
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -t $ECR_REGISTRY/$ECR_REPOSITORY:latest -f services/${{ matrix.service }}/Dockerfile .
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
+
+    - name: Deploy to App Runner
+      run: |
+        SERVICE_NAME="capmate-${{ matrix.service }}"
+        SERVICE_ARN=$(aws apprunner list-services --query "ServiceSummaryList[?ServiceName=='$SERVICE_NAME'].ServiceArn" --output text)
+        
+        if [ -n "$SERVICE_ARN" ]; then
+          console.log("Starting deployment for $SERVICE_NAME ($SERVICE_ARN)...")
+          aws apprunner start-deployment --service-arn $SERVICE_ARN
+        else
+          console.log("Service $SERVICE_NAME not found. Skipping deployment trigger (ensure Terraform created it).")
+        fi

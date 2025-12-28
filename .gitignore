@@ -6,3 +6,9 @@ coverage
 .expo
 web-build
 *.log
+
+# Terraform
+*.tfstate
+*.tfstate.backup
+.terraform/
+.terraform.lock.hcl
