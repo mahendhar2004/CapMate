@@ -18,9 +18,9 @@ export const listListings = async (req: Request, res: Response, next: NextFuncti
         ]);
 
         // Privacy filter for list view
-        const sanitizedListings = listings.map(listing => {
+        const sanitizedListings = listings.map((listing: any) => {
             if (listing.visibilityMode === 'ANONYMOUS') {
-                (listing as any).seller = undefined;
+                listing.seller = undefined;
             }
             return listing;
         });
